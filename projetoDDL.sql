@@ -1,15 +1,11 @@
--- DROP TABLE individuo,empresa,processo_judicial,julgamento,cargo,partido,candidatura,pleito,doacao,doacao_juridica,membro_equipe
+-- DROP TABLE individuo,empresa,processo_judicial,julgamento,cargo,partido,candidatura,pleito,doacao,doacao_juridica,membro_equipe,equipe
 -- DROP TYPE cargo_tipo, local_tipo
 
---POSSIVEIS POBLEMAS NO MOMENTO:
---	(1)SE O INSERT NA TABELA DAR ERRO, DEVIDO A REPETICAO DO UNIQUE KEY, O SEQUENCE
---É INCREMETADO DE QUALQUER MODO, OU SEJA, SE FAZER INSERT DE NOVO, O ID QUE DEVERIA
---SER 2 POR EXEMPLO, VAI SER O VALOR DE 4, JA QUE CONTABILIZOU NO INSERT QUE HOUVE ERRO
-
+--TODO UPDATE ou DELETE ou INSERT no julgamento com data nao nula, verificar a ficha de tds individuos
 
 --TODO triggers
---	Cada cargo deve ter uma quantidade de eleitos – por exemplo, a presidência só pode ter um único
---eleito; o cargo de deputado federal pode ter até 500 eleitos
+-- Um indivíduo é considerado ficha-limpa em uma certa data, caso não tenha nenhum processo
+-- julgado até aquela data, ou até a cinco anos antes;
 
 --TODO no MER e CROWS FOOT
 --	(1)Retirar da heranca no MER e CROWS FOOT
@@ -18,9 +14,8 @@
 --	(4)adicionar atributo 'partido' na candidatura
 -- 	(5)Nao ha entidade equipe mais, somente membro_equipe com relacao direta com a candidatura
 
-
 CREATE TABLE IF NOT EXISTS individuo (
-	cpf VARCHAR, -- TODO colocar condicao para inserir cpf_cnpj com digitos corretos
+	cpf VARCHAR(11), -- TODO colocar condicao para inserir CPF com digitos corretos
 	nome VARCHAR NOT NULL,
 	data_nascimento DATE NOT NULL,
 	ficha_limpa BOOLEAN DEFAULT TRUE,
@@ -30,27 +25,25 @@ CREATE TABLE IF NOT EXISTS individuo (
 );
 
 CREATE TABLE IF NOT EXISTS empresa (
-	cnpj VARCHAR,
+	cnpj VARCHAR(14),
 	nome VARCHAR NOT NULL,
 	
 	CONSTRAINT empresa_cnpj PRIMARY KEY(cnpj),
 	CONSTRAINT empresa_un UNIQUE(nome)
 );
 
-CREATE SEQUENCE processo_id;
 CREATE TABLE IF NOT EXISTS processo_judicial (
-	num_processo INTEGER NOT NULL DEFAULT nextval('processo_id'),
+	num_processo SERIAL,
 	crime VARCHAR NOT NULL,
-	procedente BOOLEAN DEFAULT FALSE,
 	
 	CONSTRAINT processo_judicial_pk PRIMARY KEY(num_processo)
 );
-ALTER SEQUENCE processo_id OWNED BY processo_judicial.num_processo;
 
 CREATE TABLE IF NOT EXISTS julgamento(
 	cpf	 VARCHAR NOT NULL,
 	num_processo INTEGER NOT NULL,
-	data DATE  NOT NULL,
+	procedente BOOLEAN DEFAULT FALSE,
+	data DATE,
 	
 	CONSTRAINT julgamento_pk PRIMARY KEY(cpf,num_processo),
 	CONSTRAINT julgamento_fk_cpf
@@ -74,18 +67,17 @@ CREATE TABLE IF NOT EXISTS julgamento(
 --Podemos criar um trigger que faz um SET na quantidade de cadeiras que podem ter no cargo, 
 --que eh ativado tds vez que faz um INSERT
 
-CREATE TYPE cargo_tipo AS ENUM('presidente','deputado');
+CREATE TYPE cargo_tipo AS ENUM('presidente','deputado','prefeito');
 CREATE TYPE local_tipo AS ENUM('pais','estado','cidade','distrito');
 
 CREATE TABLE IF NOT EXISTS cargo (
 	nome cargo_tipo NOT NULL,
-	cadeiras INTEGER DEFAULT 0, --nao sei o que fazer com isso
+	cadeiras INTEGER DEFAULT 0,
 	local VARCHAR NOT NULL,
 	tipoLocal local_tipo NOT NULL,
 	salario INTEGER NOT NULL, 
 	
 	CONSTRAINT cargo_pk PRIMARY KEY(nome,local,tipoLocal)
-	-- ha algum check que precisa ser feito
 );
 
 --Todo candidato deve ter um partido, que deve ser único;
@@ -109,7 +101,6 @@ CREATE TABLE IF NOT EXISTS candidatura (
 	
 	CONSTRAINT candidatura_pk PRIMARY KEY(candidato,ano),
 	--So pode assumir um cargo num determinado ano uma vez so
-	CONSTRAINT candidatura_cargo_un UNIQUE (cargo,local,tipoLocal,candidato,ano), 
 	
 	CONSTRAINT candidatura_fk_candidato
 		FOREIGN KEY(candidato)
@@ -138,56 +129,55 @@ CREATE TABLE IF NOT EXISTS candidatura (
 
 CREATE TABLE IF NOT EXISTS pleito (
 	ano INTEGER NOT NULL,
-	candidatura VARCHAR NOT NULL,
+	candidato VARCHAR NOT NULL,
 	num_votos INTEGER DEFAULT 0,
 	
-	CONSTRAINT pleito_pk PRIMARY KEY(ano,candidatura),
-	CONSTRAINT pleito_fk_candidatura
-		FOREIGN KEY(candidatura,ano)
+	CONSTRAINT pleito_pk PRIMARY KEY(ano,candidato),
+	CONSTRAINT pleito_fk_candidato
+		FOREIGN KEY(candidato,ano)
 		REFERENCES candidatura(candidato,ano)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
-	CONSTRAINT num_votos_positive CHECK (num_votos > 0) 
+	CONSTRAINT num_votos_positive CHECK (num_votos > 0),
+	CONSTRAINT pleito_ano CHECK(ano > 1800 AND ano < 3000)
 );
 
-CREATE SEQUENCE doacao_seq;
 CREATE TABLE IF NOT EXISTS doacao(
 	valor INTEGER NOT NULL,
 	doador VARCHAR NOT NULL,
-	candidatura VARCHAR NOT NULL,
+	candidato VARCHAR NOT NULL,
 	ano INTEGER NOT NULL,
-	id INTEGER NOT NULL DEFAULT nextval('doacao_seq'), --pode doar varias vezes
+	id SERIAL, 
 	
-	CONSTRAINT doacao_pk PRIMARY KEY(doador,candidatura,ano,id),
+	CONSTRAINT doacao_pk PRIMARY KEY(id),
 	CONSTRAINT doacao_fk_doador
 		FOREIGN KEY(doador)
 		REFERENCES individuo(cpf)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
 	CONSTRAINT doacao_fk_candidatura
-		FOREIGN KEY(candidatura,ano)
+		FOREIGN KEY(candidato,ano)
 		REFERENCES candidatura(candidato,ano)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
 	CONSTRAINT doacao_ano CHECK(ano > 1800 AND ano < 3000),
 	CONSTRAINT doacao_valor_positive CHECK(valor > 0)
 );
-ALTER SEQUENCE doacao_seq OWNED BY doacao.id;
 
 CREATE TABLE IF NOT EXISTS doacao_juridica(
 	valor INTEGER NOT NULL,
 	doador VARCHAR NOT NULL,
-	candidatura VARCHAR NOT NULL,
+	candidato VARCHAR NOT NULL,
 	ano INTEGER NOT NULL,
 	
-	CONSTRAINT doacao_juridica_pk PRIMARY KEY(doador,candidatura,ano),
+	CONSTRAINT doacao_juridica_pk PRIMARY KEY(doador,candidato,ano),
 	CONSTRAINT doacao_juridica_fk_doador
 		FOREIGN KEY(doador)
 		REFERENCES empresa(cnpj)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
 	CONSTRAINT doacao_juridica_fk_candidatura
-		FOREIGN KEY(candidatura,ano)
+		FOREIGN KEY(candidato,ano)
 		REFERENCES candidatura(candidato,ano)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
@@ -197,33 +187,35 @@ CREATE TABLE IF NOT EXISTS doacao_juridica(
 
 CREATE TABLE IF NOT EXISTS equipe(
 	nome VARCHAR NOT NULL,
-	candidatura VARCHAR NOT NULL,
+	candidato VARCHAR NOT NULL,
 	ano INTEGER NOT NULL,
 	
-	CONSTRAINT equipe_pk PRIMARY KEY(nome),
+	CONSTRAINT equipe_pk PRIMARY KEY(nome,ano),
 	CONSTRAINT equipe_fk_candidatura
-		FOREIGN KEY(candidatura,ano)
+		FOREIGN KEY(candidato,ano)
 		REFERENCES candidatura(candidato,ano)
 		ON DELETE CASCADE
-		ON UPDATE CASCADE
+		ON UPDATE CASCADE,
+	CONSTRAINT equipe_ano CHECK(ano > 1800 AND ano < 3000)
 );
 
 CREATE TABLE IF NOT EXISTS membro_equipe (
 	membro VARCHAR NOT NULL,
-	candidatura VARCHAR NOT NULL,
+	equipe VARCHAR NOT NULL,
 	ano INTEGER NOT NULL,
 	
-	CONSTRAINT membro_equipe_pk PRIMARY KEY(membro,candidatura,ano),
-	CONSTRAINT membro_equipe_fk_candidatura
-		FOREIGN KEY(candidatura,ano)
-		REFERENCES candidatura(candidato,ano)
+	CONSTRAINT membro_equipe_pk PRIMARY KEY(membro,ano),
+	CONSTRAINT membro_equipe_fk_equipe
+		FOREIGN KEY(equipe,ano)
+		REFERENCES equipe(nome,ano)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE,
 	CONSTRAINT membro_equipe_fk_membro 
 		FOREIGN KEY(membro)
 		REFERENCES individuo(cpf)
 		ON DELETE CASCADE
-		ON UPDATE CASCADE
+		ON UPDATE CASCADE,
+	CONSTRAINT membro_equipe_ano CHECK(ano > 1800 AND ano < 3000)
 );
 
 --	Só podem se candidatar indivíduos ficha-limpa;
@@ -234,7 +226,6 @@ BEGIN
 	SELECT INTO candidato_row * FROM individuo WHERE cpf = NEW.candidato;
 	IF(candidato_row.ficha_limpa = FALSE) THEN
 		RAISE EXCEPTION 'Não é possível candidatar-se o indivíduo, pois possui uma ficha não limpa.';
-		ROLLBACK;
 	END IF;
 	RETURN NEW;
 END;
@@ -244,8 +235,10 @@ $rejeitar_candidato_sujo$ LANGUAGE plpgsql;
 -- ficha suja na tabela de candidatura.
 --DROP TRIGGER RejeitarCandidatoComFichaSuja ON CANDIDATURA
 CREATE TRIGGER RejeitarCandidatoComFichaSuja
-	AFTER INSERT OR UPDATE ON Candidatura
+	BEFORE INSERT OR UPDATE ON Candidatura
 	FOR EACH ROW EXECUTE PROCEDURE rejeitar_candidato_sujo();
+	
+	
 	
 CREATE OR REPLACE FUNCTION update_candidatura() RETURNS trigger AS $update_candidatura$
 DECLARE
@@ -270,9 +263,17 @@ CREATE TRIGGER RemoverCandidatoComFichaSuja
 	FOR EACH ROW EXECUTE PROCEDURE update_candidatura();
 
 --TODO apagar depois, somente usado para testar triggers
-SELECT I.CPF,I.NOME,I.FICHA_LIMPA FROM CANDIDATURA C, INDIVIDUO I WHERE I.CPF = C.CANDIDATO
-INSERT INTO candidatura VALUES('86713773427',NULL,2019,'deputado','Mogi das Cruzes','cidade','Partido dos Padeiro');
-DELETE FROM CANDIDATURA WHERE CANDIDATURA.CANDIDATO = '86713773427'
-SELECT * FROM CANDIDATURA
+-- SELECT I.CPF,I.NOME,I.FICHA_LIMPA FROM CANDIDATURA C, INDIVIDUO I WHERE I.CPF = C.CANDIDATO
+-- INSERT INTO candidatura VALUES('83784243673',NULL,2019,'deputado','Mogi das Cruzes','cidade','Partido dos Padeiro');
+-- DELETE FROM CANDIDATURA WHERE CANDIDATURA.CANDIDATO = '86713773427'
+-- UPDATE INDIVIDUO SET FICHA_LIMPA = FALSE WHERE CPF = '83784243673'
+-- SELECT * FROM INDIVIDUO
 
 
+-- --TODO, UMA FORMA DE FILTRAR OS NUM_VOTOS
+-- select C.ano,candidato,cargo,local,num_votos from candidatura C left join pleito P ON C.candidato = P.candidato WHERE C.ano = 2020
+
+-- select NOME,ANO from candidatura
+-- select * from pleito
+
+--MENU DE INSERCAO DE DADOS, ATUALIZACAO DE DADOS, REMOCAO DE DADOS, VISUALIZAR DADOS, CALCULAR ELEITOS(ANO,CARGO)
