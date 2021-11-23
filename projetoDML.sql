@@ -46,9 +46,9 @@ INSERT INTO julgamento VALUES('83784243673',5,true,'2020-01-11');
 INSERT INTO julgamento VALUES('59119856598',5,false,NULL);
 
 --INSERT INTO cargo(nome,local,tipoLocal,salario) VALUES('nome','local','tipoLocal',salario); 
-INSERT INTO cargo(nome,local,tipoLocal,salario) VALUES('presidente','Brasil','pais',200000);
-INSERT INTO cargo(nome,local,tipoLocal,salario) VALUES('deputado','Mogi das Cruzes','cidade',12000);
-INSERT INTO cargo(nome,local,tipoLocal,salario) VALUES('deputado','Sao Carlos','cidade',21000);
+INSERT INTO cargo VALUES('presidente',1,'Brasil','pais',200000);
+INSERT INTO cargo VALUES('deputado',2,'Mogi das Cruzes','cidade',12000);
+INSERT INTO cargo VALUES('deputado',2,'Sao Carlos','cidade',21000);
 
 -- INSERT INTO partido VALUES('nome', 'programa')
 INSERT INTO partido VALUES('Partido dos Idosos', 'Construir asilos na beira da praia, bingo todos finais de semana, etc.');
@@ -65,7 +65,7 @@ INSERT INTO candidatura VALUES('59119856598',NULL,2018,'deputado','Sao Carlos','
 INSERT INTO candidatura VALUES('79548301288',NULL,2018,'deputado','Sao Carlos','cidade','Partido dos Idosos');
 INSERT INTO candidatura VALUES('65594180818',NULL,2020,'presidente','Brasil','pais','Partido dos Padeiro');
 
--- INSERT INTO pleito VALUES(ano,candidatura,num_votos)
+-- INSERT INTO pleito VALUES(ano,candidati,num_votos)
 INSERT INTO pleito VALUES(2020,'81387911600',6543210);
 INSERT INTO pleito VALUES(2020,'22126173135',7005000);
 INSERT INTO pleito VALUES(2021,'12750152470',8000000);
