@@ -9,22 +9,19 @@
  */
 package bd_projeto2;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+<<<<<<< HEAD
 import java.util.logging.Level;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+=======
+>>>>>>> e4fb68de4b43a1bcacf3ee100c430ccc6e464a98
 
-/**
- *
- * @author Junio
- */
 public class BD_Projeto2 {
 
     /**
@@ -86,7 +83,7 @@ public class BD_Projeto2 {
                 );
             }
             connection.close();
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException | SQLException ex) {
             System.out.println("Error: "+ex.getMessage());
         }
         System.out.println("Fim");
