@@ -147,6 +147,7 @@ public class BD_Projeto2 {
                         System.out.println("Digite 'DELETAR' para excluir algum dado dessa tabela");
                         reader = bufferRead.readLine();
                     }
+                    break;
                 }
                 case 2 ->
                 {
@@ -248,6 +249,7 @@ public class BD_Projeto2 {
                         );          
                         count++;
                     }
+                    break;
                 }
 
 
@@ -262,20 +264,24 @@ public class BD_Projeto2 {
                                 + rs.getString("Nome")
                         );
                     }
+                    break;
                 }
                 case 5 ->
-                { 
-                   System.out.println("Operação Finalizada");
-                   break;
+                {
+                    System.out.println("Operação Finalizada");
+                    break;
                 }
                 default ->
-                { 
-                   System.out.println("Número inválido");
+                {   
+                    System.out.println("Número inválido");
+                    break;
                 }
            }
             connection.close();
             stmt.close();
-        } catch (ClassNotFoundException | SQLException ex) {
+        } 
+        catch (ClassNotFoundException | SQLException ex) 
+        {
             System.out.println("Error: "+ex.getMessage());
         }
     }
