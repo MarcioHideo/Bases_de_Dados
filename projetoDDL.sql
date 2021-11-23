@@ -1,21 +1,10 @@
 -- DROP TABLE individuo,empresa,processo_judicial,julgamento,cargo,partido,candidatura,pleito,doacao,doacao_juridica,membro_equipe,equipe
 -- DROP TYPE cargo_tipo, local_tipo
 
---TODO UPDATE ou DELETE ou INSERT no julgamento com data nao nula, verificar a ficha de tds individuos
-
---TODO triggers
--- Um indivíduo é considerado ficha-limpa em uma certa data, caso não tenha nenhum processo
--- julgado até aquela data, ou até a cinco anos antes;
-
---TODO no MER e CROWS FOOT
---	(1)Retirar da heranca no MER e CROWS FOOT
---  (2)Adicionar empresa no MER e Crows foot
---	(3)remover programa_partido
---	(4)adicionar atributo 'partido' na candidatura
--- 	(5)Nao ha entidade equipe mais, somente membro_equipe com relacao direta com a candidatura
+--TODO PROTOTIPO -> MENU DE INSERCAO DE DADOS, ATUALIZACAO DE DADOS, REMOCAO DE DADOS, VISUALIZAR DADOS, CALCULAR ELEITOS(ANO,CARGO)
 
 CREATE TABLE IF NOT EXISTS individuo (
-	cpf VARCHAR(11), -- TODO colocar condicao para inserir CPF com digitos corretos
+	cpf VARCHAR(11),
 	nome VARCHAR NOT NULL,
 	data_nascimento DATE NOT NULL,
 	ficha_limpa BOOLEAN DEFAULT TRUE,
@@ -58,15 +47,6 @@ CREATE TABLE IF NOT EXISTS julgamento(
 		ON UPDATE CASCADE
 );
 
---Cada candidatura deve ter um pleito associado;
---Um pleito deve indicar a quantidade de votos recebida por cada candidato para cada cargo, em
---cada ano; isto é, cada candidatura deve gerar uma votação para um dado candidato;
---Cada cargo deve ter uma quantidade de eleitos – por exemplo, a presidência só pode ter um único
---eleito; o cargo de deputado federal pode ter até 500 eleitos;
-
---Podemos criar um trigger que faz um SET na quantidade de cadeiras que podem ter no cargo, 
---que eh ativado tds vez que faz um INSERT
-
 CREATE TYPE cargo_tipo AS ENUM('presidente','deputado','prefeito');
 CREATE TYPE local_tipo AS ENUM('pais','estado','cidade','distrito');
 
@@ -80,8 +60,6 @@ CREATE TABLE IF NOT EXISTS cargo (
 	CONSTRAINT cargo_pk PRIMARY KEY(nome,local,tipoLocal)
 );
 
---Todo candidato deve ter um partido, que deve ser único;
---Cada partido deve ter um programa (texto explicativo de suas intenções);
 CREATE TABLE IF NOT EXISTS partido(
 	nome VARCHAR NOT NULL,
 	programa VARCHAR NOT NULL,
@@ -100,7 +78,6 @@ CREATE TABLE IF NOT EXISTS candidatura (
 	partido VARCHAR NOT NULL,
 	
 	CONSTRAINT candidatura_pk PRIMARY KEY(candidato,ano),
-	--So pode assumir um cargo num determinado ano uma vez so
 	
 	CONSTRAINT candidatura_fk_candidato
 		FOREIGN KEY(candidato)
@@ -239,7 +216,6 @@ CREATE TRIGGER RejeitarCandidatoComFichaSuja
 	FOR EACH ROW EXECUTE PROCEDURE rejeitar_candidato_sujo();
 	
 	
-	
 CREATE OR REPLACE FUNCTION update_candidatura() RETURNS trigger AS $update_candidatura$
 DECLARE
 	candidato_row candidatura;
@@ -269,11 +245,54 @@ CREATE TRIGGER RemoverCandidatoComFichaSuja
 -- UPDATE INDIVIDUO SET FICHA_LIMPA = FALSE WHERE CPF = '83784243673'
 -- SELECT * FROM INDIVIDUO
 
+--TODO UPDATE ou DELETE ou INSERT no julgamento com data nao nula, verificar a ficha de tds individuos
 
--- --TODO, UMA FORMA DE FILTRAR OS NUM_VOTOS
--- select C.ano,candidato,cargo,local,num_votos from candidatura C left join pleito P ON C.candidato = P.candidato WHERE C.ano = 2020
 
--- select NOME,ANO from candidatura
--- select * from pleito
+CREATE OR REPLACE FUNCTION update_individuos_ficha() RETURNS trigger AS $update_individuos_ficha$
+DECLARE
+	years_difference integer;
+	individuo_row individuo;
+BEGIN
+	SELECT INTO individuo_row * FROM individuo WHERE cpf = NEW.cpf; 
+	SELECT INTO years_difference DATE_PART('year', AGE(current_date, NEW.data));
+	IF(NEW.procedente <> OLD.procedente OR OLD.procedente IS NULL) THEN 
+		IF(NEW.procedente = true AND years_difference <= 5 AND individuo_row.ficha_limpa = true) THEN
+			UPDATE individuo SET ficha_limpa = false WHERE cpf = NEW.cpf;
+		ELSEIF(NEW.procedente = false AND individuo_row.ficha_limpa = false) THEN
+			RAISE NOTICE'% possui uma ficha limpa agora.',individuo_row.nome;
+			UPDATE individuo SET ficha_limpa = true WHERE cpf = NEW.cpf;
+		END IF;
+	END IF;
+	RETURN NEW;
+END;
+$update_individuos_ficha$ LANGUAGE plpgsql;
 
---MENU DE INSERCAO DE DADOS, ATUALIZACAO DE DADOS, REMOCAO DE DADOS, VISUALIZAR DADOS, CALCULAR ELEITOS(ANO,CARGO)
+-- 	Para toda vez que haver um julgamento novo ou atualizado
+-- com o procedente alterado,verificar-se a necessidade de alterar
+-- a ficha do individuo
+--DROP TRIGGER AtualizarFichaDosIndividuos ON julgamento
+CREATE TRIGGER AtualizarFichaDosIndividuos
+	AFTER UPDATE OR INSERT ON julgamento
+	FOR EACH ROW EXECUTE PROCEDURE update_individuos_ficha();
+
+CREATE OR REPLACE FUNCTION update_individuos_ficha_for_deleted_cases() RETURNS trigger AS $update_individuos_ficha_for_deleted_cases$
+DECLARE
+	years_difference integer;
+	individuo_row individuo;
+BEGIN
+	SELECT INTO individuo_row * FROM individuo WHERE cpf = OLD.cpf; 
+	SELECT INTO years_difference DATE_PART('year', AGE(current_date, OLD.data));
+	IF(individuo_row.ficha_limpa = false AND OLD.procedente = true AND years_difference <= 5) THEN 
+		RAISE NOTICE'% possui uma ficha limpa agora.',individuo_row.nome;
+		UPDATE individuo SET ficha_limpa = true WHERE cpf = OLD.cpf;
+	END IF;
+	RETURN NEW;
+END;
+$update_individuos_ficha_for_deleted_cases$ LANGUAGE plpgsql;
+
+--	Quando deletar um julgamento que culpava um individuo é deletado,
+--retira a ficha suja do individuo que era culpado.
+--DROP TRIGGER AtualizarFichaDosIndividuosAposRemocaoDeJulgamento ON julgamento
+CREATE TRIGGER AtualizarFichaDosIndividuosAposRemocaoDeJulgamento
+	AFTER DELETE ON julgamento
+	FOR EACH ROW EXECUTE PROCEDURE update_individuos_ficha_for_deleted_cases();
