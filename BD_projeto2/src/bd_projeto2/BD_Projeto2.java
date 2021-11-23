@@ -256,7 +256,6 @@ public class BD_Projeto2 {
            }
             connection.close();
             stmt.close();
-            stmtBuffer.close();
         } catch (ClassNotFoundException | SQLException ex) {
             System.out.println("Error: "+ex.getMessage());
         }
