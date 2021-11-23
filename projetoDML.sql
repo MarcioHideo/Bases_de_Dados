@@ -21,6 +21,7 @@ INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('83784243673','Francisco 
 INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('22364784964','Priscila Lima','1968-08-19');--ficha_suja
 INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('42425489150','Henrique Oliveira','1964-12-29');--ficha_suja
 INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('44216533302','Raysa Gomes','1986-04-16');--ficha_suja
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('65594180818','Ronaldo Casemiro','1980-10-01');--membro_PI
 
 -- INSERT INTO empresa VALUES('cnpj','nome')
 INSERT INTO empresa VALUES('23178074000118','Ford');
@@ -62,6 +63,7 @@ INSERT INTO candidatura VALUES('68005813724',NULL,2019,'deputado','Mogi das Cruz
 INSERT INTO candidatura VALUES('80623351358',NULL,2019,'deputado','Mogi das Cruzes','cidade','Partido dos Jovens');
 INSERT INTO candidatura VALUES('59119856598',NULL,2018,'deputado','Sao Carlos','cidade','Partido dos Jovens');
 INSERT INTO candidatura VALUES('79548301288',NULL,2018,'deputado','Sao Carlos','cidade','Partido dos Idosos');
+INSERT INTO candidatura VALUES('65594180818',NULL,2020,'presidente','Brasil','pais','Partido dos Padeiro');
 
 -- INSERT INTO pleito VALUES(ano,candidatura,num_votos)
 INSERT INTO pleito VALUES(2020,'81387911600',6543210);
@@ -71,6 +73,7 @@ INSERT INTO pleito VALUES(2019,'68005813724',123000);
 INSERT INTO pleito VALUES(2019,'80623351358',230980);
 INSERT INTO pleito VALUES(2018,'59119856598',120920);
 INSERT INTO pleito VALUES(2018,'79548301288',140250);
+INSERT INTO pleito VALUES(2020,'65594180818',800000);
 
 -- INSERT INTO doacao VALUES(valor,'doador','candidato',ano)
 INSERT INTO doacao VALUES(1200,'39031644293','81387911600',2020);
