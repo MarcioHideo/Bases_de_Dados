@@ -1,29 +1,26 @@
--- DROP TABLE individuo,empresa,processo_judicial,julgamento,cargo,partido,candidatura,pleito,doacao,doacao_juridica,equipe,membro_equipe
--- DROP TYPE cargo_tipo, local_tipo
-
 -- INSERT INTO individuo VALUES('cpf','nome',data_nascimento,fichaLimpa)
-INSERT INTO individuo VALUES('81387911600','Manuel Manual','1990-12-09',true); --Cand_pres_PI
-INSERT INTO individuo VALUES('22126173135','Ednaldo Pereira','1970-09-02',true);--Cand_pres_PJ
-INSERT INTO individuo VALUES('12750152470','Eduardo Santos','2000-10-23',true);--Cand_pres_PP
-INSERT INTO individuo VALUES('42758176726','Leandro Gomes','1990-10-23',true);--Cand_vice_pres_PJ
-INSERT INTO individuo VALUES('26338856086','Karen Sakiyama','1980-06-18',true);--Cand_vice_pres_PP
-INSERT INTO individuo VALUES('68005813724','Gabriela Pereira','1960-07-29',true);--Dep_Mog_PI
-INSERT INTO individuo VALUES('80623351358','Paulo Tanaka','1976-01-20',true);--Dep_Mog_PP
-INSERT INTO individuo VALUES('59119856598','Silvio Santos','1963-11-30',true);--Dep_Sanca_PJ
-INSERT INTO individuo VALUES('79548301288','Ana Paula','1968-03-01',true);--Dep_Sanca_PI
-INSERT INTO individuo VALUES('13874257142','Walt Disney','1959-10-23',true);--membro_PI
-INSERT INTO individuo VALUES('16126941446','Roger Walker','1978-09-12',true);--membro_PI
-INSERT INTO individuo VALUES('30741724286','Rodrigo Rodrigues','1963-07-16',true);--membro_PI
-INSERT INTO individuo VALUES('86713773427','Paula Ferreira','1980-07-03',true);--membro_PJ
-INSERT INTO individuo VALUES('78384158614','Mauricio de Souza','1984-09-08',true);--membro_PJ
-INSERT INTO individuo VALUES('54363931876','Lucas Alves','1966-12-25',true);--membro_PP
-INSERT INTO individuo VALUES('48515177420','Pedro Pereira','1965-06-02',true);--membro_PP
-INSERT INTO individuo VALUES('38523575430','Vanderlei Gomes','1973-01-14',true);--membro_PP
-INSERT INTO individuo VALUES('39031644293','Ronaldo Ribeiro','1975-11-12',false);--ficha_suja-Doador
-INSERT INTO individuo VALUES('83784243673','Francisco Criminoso','1980-06-15',false);--ficha_suja-Doador
-INSERT INTO individuo VALUES('22364784964','Priscila Lima','1968-08-19',false);--ficha_suja
-INSERT INTO individuo VALUES('42425489150','Henrique Oliveira','1964-12-29',false);--ficha_suja
-INSERT INTO individuo VALUES('44216533302','Raysa Gomes','1986-04-16',false);--ficha_suja
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('81387911600','Manuel Manual','1990-12-09'); --Cand_pres_PI
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('22126173135','Ednaldo Pereira','1970-09-02');--Cand_pres_PJ
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('12750152470','Eduardo Santos','2000-10-23');--Cand_pres_PP
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('42758176726','Leandro Gomes','1990-10-23');--Cand_vice_pres_PJ
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('26338856086','Karen Sakiyama','1980-06-18');--Cand_vice_pres_PP
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('68005813724','Gabriela Pereira','1960-07-29');--Dep_Mog_PI
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('80623351358','Paulo Tanaka','1976-01-20');--Dep_Mog_PP
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('59119856598','Silvio Santos','1963-11-30');--Dep_Sanca_PJ
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('79548301288','Ana Paula','1968-03-01');--Dep_Sanca_PI
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('13874257142','Walt Disney','1959-10-23');--membro_PI
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('16126941446','Roger Walker','1978-09-12');--membro_PI
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('30741724286','Rodrigo Rodrigues','1963-07-16');--membro_PI
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('86713773427','Paula Ferreira','1980-07-03');--membro_PJ
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('78384158614','Mauricio de Souza','1984-09-08');--membro_PJ
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('54363931876','Lucas Alves','1966-12-25');--membro_PP
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('48515177420','Pedro Pereira','1965-06-02');--membro_PP
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('38523575430','Vanderlei Gomes','1973-01-14');--membro_PP
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('39031644293','Ronaldo Ribeiro','1975-11-12');--ficha_suja-Doador
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('83784243673','Francisco Criminoso','1980-06-15');--ficha_suja-Doador
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('22364784964','Priscila Lima','1968-08-19');--ficha_suja
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('42425489150','Henrique Oliveira','1964-12-29');--ficha_suja
+INSERT INTO individuo(cpf,nome,data_nascimento) VALUES('44216533302','Raysa Gomes','1986-04-16');--ficha_suja
 
 -- INSERT INTO empresa VALUES('cnpj','nome')
 INSERT INTO empresa VALUES('23178074000118','Ford');
