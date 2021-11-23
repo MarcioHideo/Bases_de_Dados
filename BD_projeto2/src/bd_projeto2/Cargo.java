@@ -32,5 +32,27 @@ public class Cargo {
                         + cadeiras +  "| Salario: "
                         + salario);
     }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getLocal() {
+        return local;
+    }
+
+    public String getTipoLocal() {
+        return tipoLocal;
+    }
+
+    public int getCadeiras() {
+        return cadeiras;
+    }
+
+    public int getSalario() {
+        return salario;
+    }
+    
+    
     
 }
