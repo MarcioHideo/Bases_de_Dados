@@ -29,7 +29,7 @@ public class BD_Projeto2 {
 
 
         try {
-            /*CONEXÃO*/
+            // CONEXÃO
             Class.forName("org.postgresql.Driver");
             url = "jdbc:postgresql://localhost:5432/postgres";
             user = "postgres";
@@ -189,7 +189,7 @@ public class BD_Projeto2 {
            case 3 ->{ 
 //        - Geração de relatório de candidaturas, indicando quais 
 //        são os candidatos eleitos, inclusive os vices quando for o caso
-            System.out.println("\nCASO 3: Gerecao de relatorio de candidaturas:");
+            System.out.println("\nCASO 3: Geracao de relatorio de candidaturas:");
             rs = stmt.executeQuery("SELECT * FROM cargo ORDER BY nome");
             while(rs.next())
             {   
@@ -234,11 +234,6 @@ public class BD_Projeto2 {
             }
            }
             
-
-            
-            
-            
-            
             
             case 4 ->{ 
             System.out.println("\nCASO 4: Listagem de individuos com ficha limpa:");
@@ -260,6 +255,8 @@ public class BD_Projeto2 {
                }
            }
             connection.close();
+            stmt.close();
+            stmtBuffer.close();
         } catch (ClassNotFoundException | SQLException ex) {
             System.out.println("Error: "+ex.getMessage());
         }
