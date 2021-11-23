@@ -71,12 +71,14 @@ public class BD_Projeto2 {
             cargoTemp = cargo.get(0);//TODO, depende da escolha do usuario o cargo
             ano = 2020;// TODO, valor a ser lido no snc
             rs = stmt.executeQuery(
-                            "SELECT C.candidato AS CPF ,num_votos,nome, C.vice_candidato AS vice "
+                            "SELECT I.nome AS vice_nome, num_votos,candidato_nome FROM individuo I, " +
+                            "(SELECT num_votos,nome AS candidato_nome, C.vice_candidato AS vice "
                             + " FROM candidatura C, pleito P, individuo I WHERE C.candidato = P.candidato AND P.ano = "
                             + ano + " AND C.cargo = '" + cargoTemp.getNome()
                             + "' AND C.local = '" + cargoTemp.getLocal() 
                             + "' AND C.tipoLocal = '" + cargoTemp.getTipoLocal() 
-                            + "' AND I.cpf = C.candidato ORDER BY num_votos DESC"
+                            + "' AND I.cpf = C.candidato ORDER BY num_votos DESC) X"
+                            + " WHERE X.vice = I.cpf "
                         );
            
             count = 1;
@@ -86,9 +88,8 @@ public class BD_Projeto2 {
                
                 System.out.println(count + "  -  " 
                         + "Total de votos: " + rs.getInt("num_votos")
-                        + "| CPF: " + rs.getString("CPF")
-                        + "| Nome: " + rs.getString("nome")
-                        + "| Vice: " 
+                        + "| Nome: " + rs.getString("candidato_nome")
+                        + "| Vice: " + rs.getString("vice_nome")
                 );          
                 count++;
             }
