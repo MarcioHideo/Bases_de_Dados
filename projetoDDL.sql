@@ -1,8 +1,6 @@
 -- DROP TABLE individuo,empresa,processo_judicial,julgamento,cargo,partido,candidatura,pleito,doacao,doacao_juridica,membro_equipe,equipe
 -- DROP TYPE cargo_tipo, local_tipo
 
---TODO PROTOTIPO -> MENU DE INSERCAO DE DADOS, ATUALIZACAO DE DADOS, REMOCAO DE DADOS, VISUALIZAR DADOS, CALCULAR ELEITOS(ANO,CARGO)
-
 CREATE TABLE IF NOT EXISTS individuo (
 	cpf VARCHAR(11),
 	nome VARCHAR NOT NULL,
@@ -237,16 +235,6 @@ $update_candidatura$ LANGUAGE plpgsql;
 CREATE TRIGGER RemoverCandidatoComFichaSuja
 	AFTER UPDATE ON individuo
 	FOR EACH ROW EXECUTE PROCEDURE update_candidatura();
-
---TODO apagar depois, somente usado para testar triggers
--- SELECT I.CPF,I.NOME,I.FICHA_LIMPA FROM CANDIDATURA C, INDIVIDUO I WHERE I.CPF = C.CANDIDATO
--- INSERT INTO candidatura VALUES('83784243673',NULL,2019,'deputado','Mogi das Cruzes','cidade','Partido dos Padeiro');
--- DELETE FROM CANDIDATURA WHERE CANDIDATURA.CANDIDATO = '86713773427'
--- UPDATE INDIVIDUO SET FICHA_LIMPA = FALSE WHERE CPF = '83784243673'
--- SELECT * FROM INDIVIDUO
-
---TODO UPDATE ou DELETE ou INSERT no julgamento com data nao nula, verificar a ficha de tds individuos
-
 
 CREATE OR REPLACE FUNCTION update_individuos_ficha() RETURNS trigger AS $update_individuos_ficha$
 DECLARE
