@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Compiled class file
 *.class
 
@@ -21,3 +22,12 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+=======
+<<<<<<< HEAD
+/BD_Projeto2/nbproject/private/
+/BD_Projeto2/build/
+=======
+/BD_projeto2/nbproject/private/
+/BD_projeto2/build/
+>>>>>>> e4fb68de4b43a1bcacf3ee100c430ccc6e464a98
+>>>>>>> master
